@@ -1,6 +1,7 @@
 use super::*;
 // use crate::transaction::Transaction;
 use crate::errors::Result;
+use crate::transaction::Transaction;
 use bincode::serialize;
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
@@ -15,7 +16,7 @@ const TARGET_HEXT: usize = 4;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Block {
     timestamp : u128,
-    transactions: String,
+    transactions: Vec<Transaction>,
     prev_block_hash : String,
     hash : String,
     height : usize,
@@ -32,11 +33,11 @@ impl Block {
         self.prev_block_hash.clone()
     }
 
-    pub fn new_genesis_block() -> Block {
-        Block::new_block(String::from("Genesis Block"), String::new(), 0).unwrap()
+    pub fn new_genesis_block(coinbase : Transaction) -> Block {
+        Block::new_block(vec![coinbase], String::new(), 0).unwrap()
     }
 
-    pub fn new_block(data: String, prev_block_hash: String, height: usize) -> Result<Block> {
+    pub fn new_block(data: Vec<Transaction>, prev_block_hash: String, height: usize) -> Result<Block> {
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_millis();
