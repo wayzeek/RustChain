@@ -1,12 +1,11 @@
-use super::*;
 // use crate::transaction::Transaction;
 use crate::errors::Result;
 use crate::transaction::Transaction;
-use bincode::serialize;
+// use bincode::serialize;
 use crypto::digest::Digest;
 use crypto::sha2::Sha256;
-use merkle_cbt::merkle_tree::Merge;
-use merkle_cbt::merkle_tree::CBMT;
+// use merkle_cbt::merkle_tree::Merge;
+// use merkle_cbt::merkle_tree::CBMT;
 use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 use log::info;

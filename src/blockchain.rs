@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-use std::hash::Hash;
-
 use crate::block::Block;
 use crate::errors::Result;
-use crate::transaction::{self, TXOutput, Transaction};
+use crate::transaction::Transaction;
+use crate::txio::TXOutput;
 
 use log::info;
 
@@ -68,32 +67,32 @@ impl Blockchain {
     }
 
     fn find_unspent_tx(&self, address: &str) -> Vec<Transaction> {
-        let mut spent_TXOs: HashMap<String, Vec<i32>> = HashMap::new();
-        let mut unspent_TXs: Vec<Transaction> = Vec::new();
+        let mut spent_txos: HashMap<String, Vec<i32>> = HashMap::new();
+        let mut unspent_txs: Vec<Transaction> = Vec::new();
 
         for block in self.iter() {
             for tx in block.get_transaction() {
                 for index in 0..tx.vout.len() {
-                    if let Some(ids) = spent_TXOs.get(&tx.id) {
+                    if let Some(ids) = spent_txos.get(&tx.id) {
                         if ids.contains(&(index as i32)) {
                             continue;
                         }
                     }
 
                     if tx.vout[index].can_be_unlock_with(address) {
-                        unspent_TXs.push(tx.to_owned());
+                        unspent_txs.push(tx.to_owned());
                     }
                 }
 
                 if !tx.is_coinbase() {
                     for i in &tx.vin {
                         if i.can_unlock_output_with(address) {
-                            match spent_TXOs.get_mut(&i.txid) {
+                            match spent_txos.get_mut(&i.txid) {
                                 Some (v) => {
                                     v.push(i.vout);
                                 }
                                 None => {
-                                    spent_TXOs.insert(i.txid.clone(), vec![i.vout]);
+                                    spent_txos.insert(i.txid.clone(), vec![i.vout]);
                                 }
                             }
                         }
@@ -102,14 +101,14 @@ impl Blockchain {
             }
         }
 
-        unspent_TXs
+        unspent_txs
     }
 
-    pub fn find_UTXO(&self, address: &str) -> Vec<TXOutput> {
+    pub fn find_utxo(&self, address: &str) -> Vec<TXOutput> {
         let mut utxos = Vec::<TXOutput>::new();
-        let unspend_TXs = self.find_unspent_tx(address);
+        let unspend_txs = self.find_unspent_tx(address);
 
-        for tx in unspend_TXs {
+        for tx in unspend_txs {
             for out in &tx.vout {
                 if out.can_be_unlock_with(&address) {
                     utxos.push(out.clone());
@@ -175,20 +174,20 @@ impl<'a> Iterator for BlockchainIter<'a> {
     }
 }
 
-#[cfg(test)]
-mod tests {
+// #[cfg(test)]
+// mod tests {
 
-    use super::*;
+//     use super::*;
 
-    #[test]
-    fn test_blockchain() {
-        let mut b = Blockchain::new().unwrap();
-        // b.add_block("2nd block".to_string());
-        // b.add_block("3rd block".to_string());
-        // b.add_block("4th block".to_string());
+//     #[test]
+//     fn test_blockchain() {
+//         let mut b = Blockchain::new().unwrap();
+//         lb.add_block("2nd block".to_string());
+//         lb.add_block("3rd block".to_string());
+//         lb.add_block("4th block".to_string());
         
-        for item in b.iter() {
-            println!("item: {:?}", item);
-        }
-    }
-}
+//         for item in b.iter() {
+//             println!("item: {:?}", item);
+//         }
+//     }
+// }

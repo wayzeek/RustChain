@@ -71,7 +71,7 @@ impl Cli {
             if let Some(address) = matches.get_one::<String>("ADDRESS") {
                 let address = String::from(address);
                 let bc = Blockchain::new()?;
-                let utxos = bc.find_UTXO(&address);
+                let utxos = bc.find_utxo(&address);
                 let mut balance = 0;
                 for out in utxos {
                     balance += out.value;
@@ -102,7 +102,7 @@ impl Cli {
                 exit(1)
             };
             let mut bc = Blockchain::new()?;
-            let tx = Transaction::new_UTXO(from, to, amount, &bc)?;
+            let tx = Transaction::new_utxo(from, to, amount, &bc)?;
             bc.add_block(vec![tx])?;
             println!("Tokens successfully sent!");
         }
