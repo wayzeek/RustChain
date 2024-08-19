@@ -45,7 +45,7 @@ impl Cli {
     }
 
     fn cmd_add_block(&mut self, data : String) -> Result<()> {
-        self.bc.add_block(data)
+        self.bc.add_block(vec![])
     }
 
     fn cmd_print_chain(&self) -> Result<()> {
