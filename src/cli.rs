@@ -3,7 +3,7 @@ use clap::{arg, Command};
 use crate::blockchain::Blockchain;
 use crate::errors::Result;
 use crate::transaction::Transaction;
-use crate::wallet::Wallets;
+// use crate::wallet::Wallets;
 
 pub struct Cli {
 
@@ -40,42 +40,43 @@ impl Cli {
             .get_matches();
 
 
-        if let Some(_) = matches.subcommand_matches("create_wallet") {
-            let mut ws = Wallets::new()?;
-            let address = ws.create_wallet();
-            ws.save_all()?;
-            println!("success: address {}", address);
-        }
+        // if let Some(_) = matches.subcommand_matches("create_wallet") {
+        //     let mut ws = Wallets::new()?;
+        //     let address = ws.create_wallet();
+        //     ws.save_all()?;
+        //     println!("success: address {}", address);
+        // }
 
-        if let Some(_) = matches.subcommand_matches("list") {
-            let ws = Wallets::new()?;
-            let addresses = ws.get_all_address();
-            println!("addresses: ");
-            for ad in addresses {
-                println!("{}", ad);
-            }
-        }
+        // if let Some(_) = matches.subcommand_matches("list") {
+        //     let ws = Wallets::new()?;
+        //     let addresses = ws.get_all_address();
+        //     println!("addresses: ");
+        //     for ad in addresses {
+        //         println!("{}", ad);
+        //     }
+        // }
 
         if let Some(ref matches) = matches.subcommand_matches("create") {
             if let Some(address) = matches.get_one::<String>("ADDRESS") {
                 let address = String::from(address);
                 Blockchain::create_blockchain(address.clone())?;
-                println!("create blockchain");
+                println!("Blockchain created, genesis minter is {address}");
             }
             /*else {
                 println!("Not printing testing lists...");
             }*/
         }
+
         if let Some(ref matches) = matches.subcommand_matches("get_balance") {
             if let Some(address) = matches.get_one::<String>("ADDRESS") {
                 let address = String::from(address);
                 let bc = Blockchain::new()?;
                 let utxos = bc.find_UTXO(&address);
-                let mut blance = 0;
+                let mut balance = 0;
                 for out in utxos {
-                    blance += out.value;
+                    balance += out.value;
                 }
-                println!("Balance of '{}'; {} ", address, blance)
+                println!("'{}' has {} token", address, balance)
             }
             /*else {
                 println!("Not printing testing lists...");
@@ -85,33 +86,31 @@ impl Cli {
             let from = if let Some(address) = matches.get_one::<String>("FROM") {
                 address
             }else {
-                println!("from not supply!: usage");
+                println!("Err: Enter from address !");
                 exit(1)
             };
             let to = if let Some(address) = matches.get_one::<String>("TO") {
                 address
             }else {
-                println!("from not supply!: usage");
+                println!("Err: Enter to address !");
                 exit(1)
             };
             let amount: i32 =   if let Some(amount) = matches.get_one::<String>("AMOUNT") {
                 amount.parse()?
             }else {
-                println!("from not supply!: usage");
+                println!("Err: Enter amount !");
                 exit(1)
             };
             let mut bc = Blockchain::new()?;
             let tx = Transaction::new_UTXO(from, to, amount, &bc)?;
             bc.add_block(vec![tx])?;
-            println!("success!");
-            /*else {
-                println!("Not printing testing lists...");
-            }*/
+            println!("Tokens successfully sent!");
         }
+
         if let Some(_) = matches.subcommand_matches("print_chain") {
             let bc = Blockchain::new()?;
             for b in &mut bc.iter() {
-                println!("block: {:#?}", b);
+                println!("Block: {:#?}", b);
             }
         }
         Ok(())
