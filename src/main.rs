@@ -1,5 +1,6 @@
 mod transaction;
 mod txio;
+mod wallet;
 
 mod block;
 mod blockchain;
